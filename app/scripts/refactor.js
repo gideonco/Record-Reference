@@ -74,27 +74,90 @@ var discogsFetch = (function(){
     function createDiscogsElement(contentElement){
     	console.log('createDiscogsElement');
 
-    	
+    	var trackListing = "";
+    		
 
-    	discogsElement = '<div id="COLLECT"><div id="information-DISCOGS"><p><strong>'; 
-    	discogsElement += discogsDataCompile.artists[0].anv 
-    	+ ' - ' 
+    	discogsElement = '<div id="collectContainer-DISCOGS" class="column"><div id="information-DISCOGS"><p><strong><a href="https://www.discogs.com/artist/'
+    	+ discogsDataCompile.artists[0].id
+    	+ '">'
+
+
+
+    	if(discogsDataCompile.artists[0].anv.length < 1){
+    		if(discogsDataCompile.artists[0].name.length < 1){
+    			discogsElement += 'Unknown Artist';
+    		}else{
+    			discogsElement += discogsDataCompile.artists[0].name;
+    		}
+    		discogsElement += discogsDataCompile.artists[0].anv;
+    	} 
+
+    	discogsElement += '</a> - '
     	+ discogsDataCompile.title 
     	+ '</strong>'
-    	+ '<p>Label: '
+    	+ '<span class="label-DISCOGS" class="column">Label: '
     	+ discogsDataCompile.labels[0].name
     	+ ' - ' 
     	+ discogsDataCompile.labels[0].catno
+    	+ '</span>'
     	+ '</p>'
     	+ '<p>'
     	+ '<strong>Tracklisting</strong>';
-
+    	
+    	trackListing += '<table class="tracklisting-DISCOGS"><tbody>';
     	discogsDataCompile.tracklist.forEach( function (track)
-		{
-		    discogsElement += "<div>" + track.title + "</div>";
-		});
+		{	
+			if(track.type_ == 'track'){
+				trackListing += '<tr class="track">'; 
+		    	if(track.position.length >= 1){
+		    		trackListing += '<td>'
+		    		+ track.position
+		    		+ '</td>';
+		    	}else{
+		    		trackListing += "<td></td>"
+		    	}
+		    	if(track.title.length >= 1){
+		    		trackListing += '<td>'
+		    		+ track.title;
+		    	}else{
+		    		trackListing += "<td>"
+		    	} 
+		    	if(track.duration.length >= 1){
+		    		trackListing += '('
+		    		+ track.duration
+		    		+ ')';
+		    	}
 
-    	discogsElement += '</p>'
+		    	trackListing += '</td></tr>';
+		    }
+
+		    if(track.type_ == 'heading'){
+		    	trackListing += '<tr class="heading">'; 
+		    	if(track.position.length >= 1){
+		    		trackListing += '<td>'
+		    		+ track.position
+		    		+ '</td>';
+		    	}else{
+		    		trackListing += "<td></td>"
+		    	}
+		    	if(track.title.length >= 1){
+		    		trackListing += '<td>'
+		    		+ track.title;
+		    	}else{
+		    		trackListing += "<td>"
+		    	} 
+		    	if(track.duration.length >= 1){
+		    		trackListing += '('
+		    		+ track.duration
+		    		+ ')';
+		    	}
+		    	trackListing += '</td></tr>';
+		    }
+		});
+    	trackListing += '</tbody></table>';
+
+    	discogsElement += trackListing
+    	+ '</p>'
     	+ '</p></div><div id="marketplace-DISCOGS"></div></div>';
 
     	contentElement.insertAdjacentHTML('afterend', discogsElement);
@@ -105,13 +168,32 @@ var discogsFetch = (function(){
     function createMarketplaceModule(contentElement){
     	console.log('createMarketplaceModule');
     	var info = document.getElementById("marketplace-DISCOGS");
+
+
     	// select 
-    	marketplaceElement = "<div><div>Price</div><div>Cond.</div><div>Title</div><div>Ships From</div>";
+    	marketplaceElement = '<table class="tracklisting-DISCOGS">'
+    	+ '<thead><td>Price</td><td>Ships From</td><td>Title</td><td>Condition</td></thead>'
+    	+ '<tbody>'
     	discogsDataCompile.marketplace.forEach( function (listing)
-		{
-		    marketplaceElement += "<div>" + listing.title + "</div>";
-		});
-    	marketplaceElement += "</div>";
+			{
+		    	marketplaceElement += '<tr><td><a target="_blank" href="https://www.discogs.com/sell/item/' + listing.id + '">' + listing.price + '</a></td><td>'+ listing.ships_from +'</td><td>' + listing.title + '</td><td>' + listing.condition + '</tr>';
+			});
+    	marketplaceElement += '</tbody>'
+     	+ '<tfoot><tr><td colspan="3"><a target="_blank" href="';
+     	
+
+		if(discogsData.type == 'masters'){
+			marketplaceElement += 'https://www.discogs.com/sell/list?master_id=' + discogsData.id
+		}
+    	if(discogsData.type == 'releases'){
+			marketplaceElement += 'https://www.discogs.com/sell/release/'  + discogsData.id
+    	}
+
+     	marketplaceElement += '">See Listing Page</a></td></tfoot>'
+     	+ '</table>';
+
+
+    	marketplaceElement += '</table>';
     	info.innerHTML = marketplaceElement;
     	return contentElement;
     }

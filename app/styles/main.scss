@@ -91,3 +91,45 @@ body {
     border-bottom: 0;
   }
 }
+
+.label-DISCOGS{
+  display:block;
+}
+
+#collectContainer-DISCOGS{
+    border-left: 3px solid #999;
+    padding-left: 9px;
+}
+
+.tracklisting-DISCOGS{
+  td{
+    padding: 0 12px 0 0px;
+  }
+}
+
+#collectContainer-DISCOGS:after{
+  content: '';
+  display: inline-block;
+  width: 100%;
+}
+
+#marketplace-DISCOGS thead{
+  font-weight: bold;
+}
+#marketplace-DISCOGS td{
+  padding: 0 12px 0 0px;
+}
+
+.column{
+  width: 100%;
+  display:inline-block;
+  vertical-align: top;
+}
+
+tr.heading{
+      background: #424242;
+    color: #fff;
+}
+
+
+
