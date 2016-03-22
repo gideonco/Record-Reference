@@ -74,10 +74,10 @@ var discogsFetch = (function(){
     function createDiscogsElement(contentElement){
     	console.log('createDiscogsElement');
 
-    	tracksListed = "yeaaah";
+    	
 
-    	discogsElement = '<div id="COLLECT"><div id="information-DISCOGS"><p><strong>' 
-    	+ discogsDataCompile.artists[0].anv 
+    	discogsElement = '<div id="COLLECT"><div id="information-DISCOGS"><p><strong>'; 
+    	discogsElement += discogsDataCompile.artists[0].anv 
     	+ ' - ' 
     	+ discogsDataCompile.title 
     	+ '</strong>'
@@ -87,9 +87,14 @@ var discogsFetch = (function(){
     	+ discogsDataCompile.labels[0].catno
     	+ '</p>'
     	+ '<p>'
-    	+ '<strong>Tracklisting</strong>'
-    	+ tracksListed
-    	+ '</p>'
+    	+ '<strong>Tracklisting</strong>';
+
+    	discogsDataCompile.tracklist.forEach( function (track)
+		{
+		    discogsElement += "<div>" + track.title + "</div>";
+		});
+
+    	discogsElement += '</p>'
     	+ '</p></div><div id="marketplace-DISCOGS"></div></div>';
 
     	contentElement.insertAdjacentHTML('afterend', discogsElement);
@@ -101,7 +106,12 @@ var discogsFetch = (function(){
     	console.log('createMarketplaceModule');
     	var info = document.getElementById("marketplace-DISCOGS");
     	// select 
-    	marketplaceElement = '<p>created</p>';
+    	marketplaceElement = "<div><div>Price</div><div>Cond.</div><div>Title</div><div>Ships From</div>";
+    	discogsDataCompile.marketplace.forEach( function (listing)
+		{
+		    marketplaceElement += "<div>" + listing.title + "</div>";
+		});
+    	marketplaceElement += "</div>";
     	info.innerHTML = marketplaceElement;
     	return contentElement;
     }
