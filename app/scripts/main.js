@@ -11,7 +11,7 @@ var discogsFetch = (function(){
     function collectDiscogsInfo(discogsLink) {
     	urlPieces = discogsLink.split("/"),
     	discogsData = new Object(),
-    	discogsMarketplace = new Object();
+    	discogsMarketplace = new Array();
 
 
     	for (var prop in urlPieces) {
@@ -27,45 +27,25 @@ var discogsFetch = (function(){
 		  	discogsData.type = 'masters';
 		  }
 		}
-
+		
 
 
     	// dummy 
     	discogsResourceUrl = 'https://api.discogs.com/' + discogsData.type + '/' + discogsData.id;
-
-    	var request = new XMLHttpRequest();
-
-	    request.open("GET", discogsResourceUrl, true);
-	    request.onload = onload;
-	    request.onerror = onerror;
-	    request.onprogress = onprogress;
-	    request.send();
-
-	    function onload() {
-	        if (request.status === 200) {
-	            console.log('successful discogs api call');
-
-	            res = JSON.parse(request.response);
-
-	            discogsDataCompile['title'] = res.title;
-	            discogsDataCompile['year'] = res.year;
-	            discogsDataCompile['labels'] = res.labels;
-	            discogsDataCompile['artists'] = res.artists;
-	            discogsDataCompile['tracklist'] = res.tracklist;
-	            deferred.resolve();
-	        } else {
-	            deferred.reject(new Error("Status code was " + request.status));
-	        }
-	    }
-
-	    function onerror() {
-	        deferred.reject(new Error("Can't XHR " + JSON.stringify(discogsResourceUrl)));
-	    }
-
-	    function onprogress(event) {
-	        deferred.notify(event.loaded / event.total);
-	    }
-	    return deferred.promise;
+    	
+    	axios.get(discogsResourceUrl)
+		  .then(function (response) {
+		    console.log('successful discogs api call');
+		    discogsDataCompile['title'] = response.title;
+            discogsDataCompile['year'] = response.year;
+            discogsDataCompile['labels'] = response.labels;
+            discogsDataCompile['artists'] = response.artists;
+            discogsDataCompile['tracklist'] = response.tracklist;
+            resolve(discogsDataCompile);
+		  })
+		  .catch(function (response) {
+		    console.log(response);
+		  });
     }
 
     function collectLinks(contentElement){
@@ -98,59 +78,41 @@ var discogsFetch = (function(){
     		marketplaceResourceUrl = 'https://api.discogs.com/marketplace/search?release_id='  + discogsData.id
     	}
 
-    	request.open("GET", marketplaceResourceUrl, true);
-	    request.onload = onload;
-	    request.onerror = onerror;
-	    request.onprogress = onprogress;
-	    request.send();
-	    function onload() {
-	    	if (request.status === 200) {
-	    		console.log('successful marketplace api call');
-	            discogsMarketplace  = JSON.parse(request.response);
-	            console.log(discogsMarketplace);
-	            deferred.resolve(discogsMarketplace);
-	        } else {
-	            deferred.reject(new Error("Status code was " + request.status));
-	        }
-	    }
+    	console.log('collectMarketplaceInfo')
 
-	    function onerror() {
-	        deferred.reject(new Error("Can't XHR " + JSON.stringify(discogsResourceUrl)));
-	    }
-
-	    function onprogress(event) {
-	        deferred.notify(event.loaded / event.total);
-	    }
-	    return deferred.promise;
     }
 
     function createDiscogsElement(contentElement){
     	console.log('createDiscogsElement');
     	contentElement.insertAdjacentHTML('afterend', '<div id="COLLECT"><div id="information-DISCOGS"></div><div id="marketplace-DISCOGS"></div></div>');
+    	return contentElement;
     }
 
     function createMarketplaceModule(contentElement){
     	console.log('createMarketplaceModule');
     	var info = document.getElementById("information-DISCOGS");
-    	console.log(discogsMarketplace);
     	// select 
-    	
-    	
-    	
+
+    	return contentElement;
     }
 
 
   	function initialize( contentElement ) {
   		discogsLinks = collectLinks(contentElement);
   		if(discogsLinks){
-	        collectDiscogsInfo(discogsLinks[0])
-	        .then(function(){
-	        	createDiscogsElement(contentElement);
-	        })
-	        .then(collectMarketplaceInfo)
-	        .then(function(){
-        		createMarketplaceModule(contentElement);
+  			
+  			collectDiscogsInfo(discogsLinks[0]).then(function(res){
+	        	console.log('after');
 	        });
+	        
+	        // 	createDiscogsElement(contentElement);
+	        // .then(collectMarketplaceInfo())
+	        // .then(function(){
+	        // 	createMarketplaceModule(contentElement)
+	        // })
+	        // .catch(function(){
+	        // 	console.log('fails');
+	        // });
   		}
     }
 
