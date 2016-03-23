@@ -1,0 +1,85 @@
+.label-DISCOGS {
+  display: block;
+}
+
+#collectContainer-DISCOGS {
+  border-left: 3px solid #999;
+  padding-left: 9px;
+}
+
+#information-DISCOGS h2{
+  font-weight: bold;
+}
+
+.tracklisting-DISCOGS{
+  width: 100%;
+}
+.tracklisting-DISCOGS td {
+    padding: 3px 6px 6px 3px;  
+}
+
+tr.track{
+  border-bottom: 1px solid rgb(236, 236, 236)
+}
+
+tr.track:last-child{
+  border-bottom: none;
+}
+
+tr.track td.position {
+    width: 22px;
+    border-right: 1px solid #ECECEC;
+}
+
+tr.track td{
+  padding: 6px 6px 6px 9px;
+}
+
+.tracklistingHeader-DISCOGS{
+  margin-top: 6px;
+}
+
+#collectContainer-DISCOGS:after {
+  content: '';
+  display: inline-block;
+  width: 100%;
+}
+
+#marketplace-DISCOGS{
+  margin-top: 20px;
+}
+
+#marketplace-DISCOGS tbody {
+  border: 1px solid #ECECEC;
+}
+
+#marketplace-DISCOGS thead {
+  font-weight: bold;
+}
+
+#marketplace-DISCOGS td {
+  padding: 6px 6px 6px 6px;   
+}
+
+#marketplace-DISCOGS tr{
+  border: 1px solid rgb(236, 236, 236);
+}
+
+#marketplace-DISCOGS tfoot tr{
+  border: none;
+}
+
+.column {
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+tr.heading {
+  background: #424242;
+  color: #fff;
+}
+
+tr.heading td{
+  padding: 6px 6px 6px 9px;
+}

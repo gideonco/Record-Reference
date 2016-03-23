@@ -1,0 +1,29 @@
+{
+"name": "Discogs Fetch",
+"description": "Discogs data in Youtube descriptions, when the url is present.",
+"version": "0.1",
+"background": {
+        "persistent":true,
+        "page":"app/bg.html"
+},
+"content_scripts": [
+	{
+      "matches": [
+      	"http://*.youtube.com/*", 
+      	"https://*.youtube.com/*"
+      ],
+      "js": [
+      	"bower_components/axios/dist/axios.min.js", 
+      	"app/scripts/content-script.js"
+      ],
+      "css": [
+      	"app/styles/main.css"
+      ],
+      "run_at": "document_end"
+    }
+],
+"browser_action": {
+"default_title": "Discogs data in Youtube descriptions"
+},
+"manifest_version": 2
+}

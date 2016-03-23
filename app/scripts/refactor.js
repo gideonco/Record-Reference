@@ -1,5 +1,3 @@
-var description = document.getElementById("eow-description");
-
 var discogsFetch = (function(){
 	
 	function collectLinks(contentElement){
@@ -222,4 +220,6 @@ var discogsFetch = (function(){
     };
 })();
 
+console.log('running');
+var description = document.getElementById("eow-description");
 discogsFetch.init(description);
