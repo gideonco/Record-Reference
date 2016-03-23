@@ -231,7 +231,18 @@ var checkExist = setInterval(function() {
         discogsFetch.init(description);
         clearInterval(checkExist);
     }
-
 }, 100); // check every 100ms
 
 checkExist;
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    console.log('changed page');
+    var checkExist = setInterval(function() {
+        if(document.getElementById("eow-description")) {
+            console.log(document.getElementById("eow-description"));
+            discogsFetch.init(description);
+            clearInterval(checkExist);
+        }
+        console.log('setInterval 100');
+    }, 100);
+});

@@ -1,7 +1,8 @@
-//Listen for when a Tab changes state
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
     if(changeInfo && changeInfo.status == "complete"){
-    	console.log('it moved');
-        checkExist;
+        chrome.tabs.sendMessage(tabId, {data: tab}, function(response) {
+            console.log('YT Changed Page');
+        });
+
     }
 });
