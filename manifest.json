@@ -1,7 +1,7 @@
 {
 "name": "Discogs Fetch",
-"description": "Discogs data in Youtube descriptions, when the url is present.",
-"version": "0.1",
+"description": "Creates a discogs information modules on youtube videos that have discogs urls.",
+"version": "0.9",
 "background": {
         "persistent":true,
         "page":"app/bg.html"
@@ -19,11 +19,11 @@
       "css": [
       	"app/styles/main.css"
       ],
-      "run_at": "document_end"
+      "run_at": "document_idle"
     }
 ],
 "browser_action": {
-"default_title": "Discogs data in Youtube descriptions"
+"default_title": "Expands discogs URLs on youtube"
 },
 "manifest_version": 2
 }

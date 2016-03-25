@@ -12,7 +12,7 @@ var discogsFetch = (function(){
         }
         
         if(links.length <= 0){
-            console.log('no links, clean me up');
+            return false;
         }else{
             // make a link out of the obj
             linksArray = Array.prototype.slice.call(links);
@@ -23,7 +23,6 @@ var discogsFetch = (function(){
 
 
     function collectDiscogsInfo(discogsLink) {
-        console.log('Start collectDiscogsInfo');
         urlPieces = discogsLink.split("/");
 
         for (var prop in urlPieces) {
@@ -48,13 +47,11 @@ var discogsFetch = (function(){
             discogsDataCompile['labels'] = response.data.labels;
             discogsDataCompile['artists'] = response.data.artists;
             discogsDataCompile['tracklist'] = response.data.tracklist;
-            console.log('Finished collectDiscogsInfo');
         });
          
     }
 
     function collectMarketplaceInfo() {
-        console.log('Start collectMarketplaceInfo');
 
         if(discogsData.type == 'masters'){
             marketplaceResourceUrl = 'https://api.discogs.com/marketplace/search?master_id=' + discogsData.id
@@ -65,43 +62,47 @@ var discogsFetch = (function(){
 
         return axios.get(marketplaceResourceUrl).then(function(response){
             discogsDataCompile['marketplace'] = response.data;
-            console.log('Finished collectMarketplaceInfo');
         });
     }
 
     function createDiscogsElement(injectionPoint){
-        console.log('createDiscogsElement');
-
+        console.log(discogsDataCompile);
         var trackListing = "";
             
-
-        discogsElement = '<div class="yt-card yt-card-has-padding"><div id="collectContainer-DISCOGS" class="column"><div id="information-DISCOGS"><p><h2><a target="_blank" href="https://www.discogs.com/artist/'
-        + discogsDataCompile.artists[0].id
-        + '">'
-
-
-
-        if(discogsDataCompile.artists[0].anv.length < 1){
-            if(discogsDataCompile.artists[0].name.length < 1){
-                discogsElement += 'Unknown Artist';
+        discogsElement = '<div class="yt-card yt-card-has-padding"><div id="collectContainer-DISCOGS" class="column"><div id="information-DISCOGS"><p><h2>';
+        
+        discogsDataCompile.artists.forEach( function (track, i){
+            discogsElement += '<a target="_blank" href="https://www.discogs.com/artist/'
+            + discogsDataCompile.artists[i].id
+            + '">';
+            
+            if(discogsDataCompile.artists[i].name.length > 1 ){
+               discogsElement += discogsDataCompile.artists[i].name;
             }else{
-                discogsElement += discogsDataCompile.artists[0].name;
+                discogsElement += discogsDataCompile.artists[i].anv;
             }
-            discogsElement += discogsDataCompile.artists[0].anv;
-        } 
+            discogsElement += '</a>'
+            if(discogsDataCompile.artists[i+1]){
+                discogsElement += ', ';
+            }
+        });
 
-        discogsElement += '</a> - '
+            
+        
+        discogsElement += ' - '
         + '<a target="_blank" href="' + discogsLinks[0] + '">'
         + discogsDataCompile.title 
         + '</a>'
         + '</h2>'
-        + '<span class="label-DISCOGS" class="column">'
-        + '<a target="_blank" href="https://www.discogs.com/label/' + discogsDataCompile.labels[0].id + '">'
-        + discogsDataCompile.labels[0].name
-        + '</a>'
-        + ' - ' 
-        + discogsDataCompile.labels[0].catno
-        + '</span>'
+        + '<span class="label-DISCOGS" class="column">';
+        if(discogsDataCompile.labels !== undefined){
+            discogsElement += '<a target="_blank" href="https://www.discogs.com/label/' + discogsDataCompile.labels[0].id + '">'
+            + discogsDataCompile.labels[0].name
+            + '</a>'
+            + ' - ' 
+            + discogsDataCompile.labels[0].catno
+            + '</span>'
+        }
         + '</p>'
         + '<p class="tracklistingHeader-DISCOGS">';
         
@@ -121,6 +122,19 @@ var discogsFetch = (function(){
                     trackListing += '<td class="title">'
                     + track.title
                     + ' ';
+                    if(track.extraartists !== undefined){
+                        trackListing += '<br><span class="extraArtists">';
+                        track.extraartists.forEach(function(ea){
+                            trackListing += '<a target="_blank" href="https://www.discogs.com/artist/'
+                            + ea.id
+                            + '">'
+                            + ea.name
+                            + '</a>'
+                            + ' - '
+                            + ea.role;
+                        });
+                        trackListing += '</span> ';
+                    }
                 }else{
                     trackListing += "<td>"
                 } 
@@ -168,7 +182,6 @@ var discogsFetch = (function(){
     }
 
     function createMarketplaceModule(contentElement){
-        console.log('createMarketplaceModule');
         var info = document.getElementById("marketplace-DISCOGS");
 
 
@@ -214,7 +227,6 @@ var discogsFetch = (function(){
                 collectMarketplaceInfo()
                 .then(function(){
                     createMarketplaceModule(contentElement);
-                    console.log("FINAL FINISH");
                 });
             })
         }
@@ -225,24 +237,25 @@ var discogsFetch = (function(){
     };
 })();
 
-var checkExist = setInterval(function() {
-    if (document.getElementById("eow-description")) {
-        var description = document.getElementById("eow-description");
-        discogsFetch.init(description);
-        clearInterval(checkExist);
-    }
-}, 100); // check every 100ms
 
-checkExist;
+var runningFlag = false;
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('changed page');
-    var checkExist = setInterval(function() {
-        if(document.getElementById("eow-description")) {
-            console.log(document.getElementById("eow-description"));
-            discogsFetch.init(description);
+chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if (request.pageChange == true && runningFlag == false){
+            runningFlag = true;
             clearInterval(checkExist);
+            var checkExist = setInterval(function(){
+                if (document.contains(document.getElementById("eow-description"))) {
+                    var description = document.getElementById("eow-description");
+                    discogsFetch.init(description);
+                    clearInterval(checkExist);
+                    runningFlag = false;
+                }
+            }, 100);
+
+            sendResponse({'complete': true, 'url': document.URL});
+            checkExist;
         }
-        console.log('setInterval 100');
-    }, 100);
-});
+     }
+);

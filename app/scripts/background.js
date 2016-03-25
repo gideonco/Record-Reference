@@ -1,8 +1,7 @@
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-    if(changeInfo && changeInfo.status == "complete"){
-        chrome.tabs.sendMessage(tabId, {data: tab}, function(response) {
-            console.log('YT Changed Page');
-        });
-
-    }
+	if(changeInfo.status == 'complete' && tab.status == 'complete'){	
+	    chrome.tabs.sendMessage(tabId, {pageChange: true}, function(response) {
+	    	console.log(response);
+		});
+	}
 });
