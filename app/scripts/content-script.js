@@ -66,7 +66,6 @@ var discogsFetch = (function(){
     }
 
     function createDiscogsElement(injectionPoint){
-        console.log(discogsDataCompile);
         var trackListing = "";
             
         discogsElement = '<div class="yt-card yt-card-has-padding"><div id="collectContainer-DISCOGS" class="column"><div id="information-DISCOGS"><p><h2>';
@@ -218,7 +217,6 @@ var discogsFetch = (function(){
         discogsMarketplace = new Array(),
         discogsDataCompile = new Object();
         injectionPoint = document.getElementById("watch-header");
-
         discogsLinks = collectLinks(contentElement);
         if(discogsLinks){
             collectDiscogsInfo(discogsLinks[0])
@@ -232,30 +230,49 @@ var discogsFetch = (function(){
         }
     }
 
+    function checkExist(){
+        if (document.contains(document.getElementById("eow-description"))) {
+            var description = document.getElementById("eow-description");
+            discogsFetch.intervalCollection.forEach(function(interval){
+                clearInterval(interval);
+            });
+            initialize(description);
+            return true;
+        }
+    };
+
+    var checkTimer = setInterval.bind(null, function() {
+        discogsFetch.checkExist();
+    }, 1000);
+
+
+    var lastUrl, myInterval;
+    var intervalCollection = new Array;
+
     return {
-        init: initialize
+        init: initialize,
+        checkExist: checkExist,
+        checkTimer: checkTimer,
+        myInterval: myInterval,
+        intervalCollection: intervalCollection,
+        lastUrl: lastUrl 
     };
 })();
 
 
-var runningFlag = false;
 
-chrome.runtime.onMessage.addListener(
+chrome.runtime.onMessage.addListener(    
     function(request, sender, sendResponse) {
-        if (request.pageChange == true && runningFlag == false){
-            runningFlag = true;
-            clearInterval(checkExist);
-            var checkExist = setInterval(function(){
-                if (document.contains(document.getElementById("eow-description"))) {
-                    var description = document.getElementById("eow-description");
-                    discogsFetch.init(description);
-                    clearInterval(checkExist);
-                    runningFlag = false;
-                }
-            }, 100);
-
-            sendResponse({'complete': true, 'url': document.URL});
-            checkExist;
+        if(discogsFetch.lastUrl != request.tab.url){
+            if (request.pageChange == true){
+                discogsFetch.myInterval = discogsFetch.checkTimer();
+                discogsFetch.intervalCollection.push(discogsFetch.myInterval);
+                sendResponse({'complete': true, 'url': document.URL});
+                discogsFetch.lastUrl = request.tab.url;
+            }else{
+                sendResponse({'complete': false, 'url': document.URL});
+            }
         }
-     }
+        
+    }
 );
