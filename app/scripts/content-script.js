@@ -130,7 +130,8 @@ var discogsFetch = (function(){
                             + ea.name
                             + '</a>'
                             + ' - '
-                            + ea.role;
+                            + ea.role
+                            + ' ' ;
                         });
                         trackListing += '</span> ';
                     }
